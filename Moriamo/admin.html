@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Create Blog Post | Moriamo A. Onabanjo</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --bg-secondary: #1e293b;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #f59e0b;
+            --secondary-color: #3b82f6;
+            --glass-border: rgba(255,255,255,0.1);
+            --glass-bg: rgba(255,255,255,0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-color); color: var(--text-color); min-height: 100vh; }
+        
+        /* Login Screen */
+        .login-screen { max-width: 380px; margin: 120px auto; text-align: center; padding: 2.5rem; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--glass-border); }
+        .login-screen h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .login-screen p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 0.8rem; border: 2px solid var(--glass-border); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem; }
+        .form-group input:focus { outline: none; border-color: var(--secondary-color); }
+        .btn { display: inline-block; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, var(--secondary-color), #2563eb); color: white; width: 100%; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
+        .error-msg { color: #ef4444; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+        
+        /* Admin Panel */
+        .admin-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .admin-header { text-align: center; margin-bottom: 2rem; }
+        .admin-header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .admin-header p { color: var(--text-muted); }
+        .admin-header a { color: var(--accent-color); text-decoration: none; font-size: 0.9rem; }
+        .admin-form { background: var(--card-bg); padding: 2rem; border-radius: 16px; border: 1px solid var(--glass-border); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-group-full { margin-bottom: 1.2rem; }
+        .form-group-full label { display: block; margin-bottom: 0.4rem; font-weight: 500; }
+        .form-group-full input, .form-group-full textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--glass-border); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem; font-family: inherit; }
+        .form-group-full input:focus, .form-group-full textarea:focus { outline: none; border-color: var(--secondary-color); }
+        .form-group-full textarea { min-height: 180px; resize: vertical; }
+        .btn-group { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .btn-secondary { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-color); }
+        
+        /* Output Section */
+        .output-section { margin-top: 2rem; padding: 1.5rem; background: var(--bg-color); border-radius: 12px; border: 1px solid var(--glass-border); display: none; }
+        .output-section h3 { font-size: 1.1rem; margin-bottom: 0.8rem; }
+        .output-section p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .output-section textarea { width: 100%; min-height: 280px; padding: 1rem; border: 1px solid var(--glass-border); border-radius: 8px; background: var(--bg-secondary); color: var(--text-color); font-family: monospace; font-size: 0.85rem; resize: vertical; }
+        .copy-btn { margin-top: 1rem; }
+        .success-msg { padding: 0.8rem; background: rgba(16,185,129,0.1); border: 1px solid #10b981; border-radius: 8px; color: #10b981; margin-top: 0.8rem; display: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <h1>Admin Login</h1>
+        <p>Enter credentials to create blog posts</p>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter password">
+        </div>
+        <p id="errorMsg" class="error-msg">Invalid credentials. Try: admin / admin123</p>
+        <button class="btn btn-primary" onclick="login()">Login</button>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-container" style="display: none;">
+        <div class="admin-header">
+            <h1>Create New Blog Post</h1>
+            <p>Fill in the details below to create a new blog post</p>
+            <a href="index.html">Back to Website</a>
+        </div>
+
+        <form class="admin-form" id="blogForm" onsubmit="generateBlogPost(event)">
+            <div class="form-row">
+                <div class="form-group-full">
+                    <label>Post Title</label>
+                    <input type="text" id="postTitle" required placeholder="Enter post title">
+                </div>
+                <div class="form-group-full">
+                    <label>Date</label>
+                    <input type="date" id="postDate" required>
+                </div>
+            </div>
+
+            <div class="form-group-full">
+                <label>URL Slug (e.g., my-new-post)</label>
+                <input type="text" id="postSlug" required placeholder="my-new-post">
+            </div>
+
+            <div class="form-group-full">
+                <label>Short Excerpt (for blog listing)</label>
+                <textarea id="postExcerpt" rows="2" required placeholder="A brief summary..."></textarea>
+            </div>
+
+            <div class="form-group-full">
+                <label>Full Article Content (HTML paragraphs)</label>
+                <textarea id="postContent" rows="10" required placeholder="<p>Your first paragraph...</p>&#10;&#10;<h2>Subheading</h2>&#10;&#10;<p>More content...</p>"></textarea>
+            </div>
+
+            <div class="form-group-full">
+                <label>Meta Description (SEO)</label>
+                <input type="text" id="metaDescription" required placeholder="Brief description for search engines">
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">Generate Blog Post</button>
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('blogForm').reset()">Clear</button>
+            </div>
+        </form>
+
+        <div class="output-section" id="outputSection">
+            <h3>Generated HTML - Copy and save as file</h3>
+            <p>Save the content below as: <strong id="filenameDisplay"></strong> in the blog/ folder</p>
+            <textarea id="generatedCode" readonly></textarea>
+            <button class="btn btn-primary copy-btn" onclick="copyCode()">Copy to Clipboard</button>
+            <div class="success-msg" id="successMsg">Copied! Now save this as an HTML file.</div>
+        </div>
+    </div>
+
+    <script>
+        // Login function
+        function login() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'admin123') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                // Set today's date
+                document.getElementById('postDate').valueAsDate = new Date();
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        // Auto-generate slug from title
+        document.getElementById('postTitle').addEventListener('input', function() {
+            var slug = this.value.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '');
+            document.getElementById('postSlug').value = slug;
+        });
+
+        // Generate blog post HTML
+        function generateBlogPost(e) {
+            e.preventDefault();
+            
+            var title = document.getElementById('postTitle').value;
+            var date = document.getElementById('postDate').value;
+            var slug = document.getElementById('postSlug').value;
+            var content = document.getElementById('postContent').value;
+            var metaDesc = document.getElementById('metaDescription').value;
+
+            // Format date
+            var dateObj = new Date(date);
+            var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            var formattedDate = months[dateObj.getMonth()] + ' ' + dateObj.getDate() + ', ' + dateObj.getFullYear();
+
+            // Build HTML string
+            var html = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <meta name="description" content="' + metaDesc + '">\n    <title>' + title + ' - Moriamo A. Onabanjo</title>\n    <link rel="stylesheet" href="../style.css">\n</head>\n<body>\n    <a href="#main-content" class="skip-link">Skip to main content</a>\n    <header>\n        <nav class="navbar">\n            <a href="../index.html" class="logo">Moriamo A. Onabanjo</a>\n            <ul class="nav-links">\n                <li><a href="../index.html">Home</a></li>\n                <li><a href="../books.html">Books</a></li>\n                <li><a href="../about.html">About Me</a></li>\n                <li><a href="../blog.html">Blog</a></li>\n                <li><a href="../contact.html">Contact</a></li>\n            </ul>\n            <div class="menu-toggle">☰</div>\n        </nav>\n    </header>\n    <main id="main-content">\n        <section class="blog-post-full">\n            <article>\n                <header class="blog-header">\n                    <a href="../blog.html" class="back-link">← Back to Blog</a>\n                    <h1>' + title + '</h1>\n                    <p class="date">' + formattedDate + '</p>\n                </header>\n                <div class="blog-content">\n                    ' + content + '\n                </div>\n            </article>\n        </section>\n    </main>\n    <footer>\n        <div class="footer-content">\n            <div class="footer-brand">\n                <a href="../index.html" class="logo">Moriamo A. Onabanjo</a>\n                <p>Nigerian author crafting faith-based fiction.</p>\n            </div>\n            <div class="footer-links">\n                <h4>Quick Links</h4>\n                <ul>\n                    <li><a href="../index.html">Home</a></li>\n                    <li><a href="../books.html">Books</a></li>\n                    <li><a href="../blog.html">Blog</a></li>\n                </ul>\n            </div>\n        </div>\n        <div class="footer-bottom">\n            <p>&copy; 2026 Moriamo A. Onabanjo. All rights reserved.</p>\n        </div>\n    </footer>\n    <script src="../script.js"><\/script>\n</body>\n</html>';
+
+            // Display the generated code
+            document.getElementById('filenameDisplay').textContent = slug + '.html';
+            document.getElementById('generatedCode').value = html;
+            document.getElementById('outputSection').style.display = 'block';
+            document.getElementById('outputSection').scrollIntoView({behavior: 'smooth'});
+        }
+
+        // Copy to clipboard
+        function copyCode() {
+            var textarea = document.getElementById('generatedCode');
+            textarea.select();
+            document.execCommand('copy');
+            document.getElementById('successMsg').style.display = 'block';
+            setTimeout(function() {
+                document.getElementById('successMsg').style.display = 'none';
+            }, 4000);
+        }
+
+        // Allow Enter key to login
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>
