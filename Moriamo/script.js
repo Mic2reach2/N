@@ -72,6 +72,22 @@ document.addEventListener('DOMContentLoaded', () => {
             navLinks.classList.toggle('active');
             menuToggle.classList.toggle('active');
         });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+
+        // Close menu on resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                navLinks.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
     }
 
     // Smooth scrolling for navigation links
@@ -151,9 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Typing effect for hero text (optional enhancement)
+    // Typing effect for hero text (optional enhancement - disabled on mobile)
     const heroTitle = document.querySelector('.hero h1');
-    if (heroTitle) {
+    if (heroTitle && window.innerWidth > 768) {
         const text = heroTitle.textContent;
         heroTitle.textContent = '';
         let i = 0;
@@ -206,9 +222,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const carouselPrev = document.querySelector('.carousel-prev');
     const carouselNext = document.querySelector('.carousel-next');
     let carouselInterval;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
     
     if (bookCarousel) {
         const scrollAmount = 340;
+        
+        // Touch swipe support for mobile
+        bookCarousel.addEventListener('touchstart', (e) => {
+            isDown = true;
+            startX = e.touches[0].pageX - bookCarousel.offsetLeft;
+            scrollLeft = bookCarousel.scrollLeft;
+            stopCarouselAutoSlide();
+        }, { passive: true });
+        
+        bookCarousel.addEventListener('touchend', () => {
+            isDown = false;
+            startCarouselAutoSlide();
+        }, { passive: true });
+        
+        bookCarousel.addEventListener('touchmove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.touches[0].pageX - bookCarousel.offsetLeft;
+            const walk = (x - startX) * 2;
+            bookCarousel.scrollLeft = scrollLeft - walk;
+        }, { passive: false });
+        
+        // Mouse drag support
+        bookCarousel.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - bookCarousel.offsetLeft;
+            scrollLeft = bookCarousel.scrollLeft;
+            bookCarousel.style.cursor = 'grabbing';
+            stopCarouselAutoSlide();
+        });
+        
+        bookCarousel.addEventListener('mouseleave', () => {
+            isDown = false;
+            bookCarousel.style.cursor = 'grab';
+            startCarouselAutoSlide();
+        });
+        
+        bookCarousel.addEventListener('mouseup', () => {
+            isDown = false;
+            bookCarousel.style.cursor = 'grab';
+            startCarouselAutoSlide();
+        });
+        
+        bookCarousel.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - bookCarousel.offsetLeft;
+            const walk = (x - startX) * 2;
+            bookCarousel.scrollLeft = scrollLeft - walk;
+        });
         
         // Auto-slide function
         function autoSlideNext() {
