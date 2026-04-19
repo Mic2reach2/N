@@ -2005,6 +2005,10 @@ textarea:focus {
         z-index: 999;
     }
 
+    .nav-links.active {
+        display: flex;
+    }
+
     .nav-links li {
         width: 100%;
     }

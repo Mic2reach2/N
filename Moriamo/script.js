@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Close mobile menu when clicking a link
             if (navLinks.classList.contains('active')) {
                 navLinks.classList.remove('active');
+                menuToggle.classList.remove('active');
             }
         });
     });
