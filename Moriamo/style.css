@@ -1730,6 +1730,7 @@ input:focus,
 textarea:focus {
     outline: 3px solid var(--accent-color);
     outline-offset: 2px;
+    outline-radius: 5px;
 }
 
 /* Skip Link */
