@@ -69,8 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (menuToggle && navLinks) {
         menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
+            const isActive = navLinks.classList.toggle('active');
             menuToggle.classList.toggle('active');
+            menuToggle.setAttribute('aria-expanded', isActive);
         });
 
         // Close menu when clicking outside
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
                 navLinks.classList.remove('active');
                 menuToggle.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
             }
         });
 
@@ -86,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.innerWidth > 768) {
                 navLinks.classList.remove('active');
                 menuToggle.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
             }
         });
     }
@@ -199,11 +202,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add loading animation for images
     const images = document.querySelectorAll('img');
     images.forEach(img => {
-        img.addEventListener('load', () => {
+        if (img.complete) {
             img.style.opacity = '1';
-        });
-        img.style.opacity = '0';
-        img.style.transition = 'opacity 0.3s ease';
+        } else {
+            img.style.opacity = '0';
+            img.style.transition = 'opacity 0.3s ease';
+            img.addEventListener('load', () => {
+                img.style.opacity = '1';
+            });
+        }
     });
 
     // Back to top button functionality
