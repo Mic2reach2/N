@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Start auto-sliding
         function startCarouselAutoSlide() {
-            carouselInterval = setInterval(autoSlideNext, 4000); // Slide every 4 seconds
+            carouselInterval = setInterval(autoSlideNext, 5000); // Slide every 5 seconds
         }
         
         function stopCarouselAutoSlide() {
