@@ -350,7 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (email) {
                 alert('Thank you for subscribing! You will receive updates at: ' + email);
                 newsletterForm.reset();
-            }
+            } else {
+            // Added this to fix the silent empty submission bug
+            alert('Please enter a valid email address.');
+        }
         });
     }
 
